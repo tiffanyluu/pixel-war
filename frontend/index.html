@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas</title>
+</head>
+<body>
+    <h1>Welcome to the Canvas</h1>
+    <canvas id="canvas" width="200" height="200" 
+        style="width:500px; height:500px; image-rendering:pixelated; border:2px solid #000000;">
+    </canvas>
+
+    <script>
+        const COLORS = [
+                "#FFFFFF", "#4A4E69", "#6D4C73", "#9C4A5E",
+                "#C26B5A", "#3F6B4F", "#4A8587", "#5C6BA8",
+                "#9A9DB0", "#FF9A8B", "#FFEFA1", "#C9B1E0",
+                "#9FB4E0", "#9AE0DB", "#B5D99C", "#22223B",
+        ];
+
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+
+        async function draw() {
+            const response = await fetch("/canvas")
+            const arrayBuffer = await response.arrayBuffer();
+            const bytes = new Uint8Array(arrayBuffer);
+
+            for (let i = 0; i < bytes.length; i++) {
+                const first_color = Math.floor(bytes[i] / 16)
+                const second_color = bytes[i] % 16
+
+                const first_pixel = i * 2
+                const first_x = first_pixel % 200
+                const first_y = Math.floor(first_pixel / 200)
+                ctx.fillStyle = COLORS[first_color]
+                ctx.fillRect(first_x, first_y, 1, 1)
+
+                const second_pixel = i * 2 + 1
+                const second_x = second_pixel % 200
+                const second_y = Math.floor(second_pixel / 200)
+                ctx.fillStyle = COLORS[second_color]
+                ctx.fillRect(second_x, second_y, 1, 1)
+            }
+        }
+
+        draw();
+
+        const ws = new WebSocket(`ws://${location.host}/ws`)
+        ws.onmessage = function (event) {
+            const pixel = JSON.parse(event.data)
+            ctx.fillStyle = COLORS[pixel.color]
+            ctx.fillRect(pixel.x, pixel.y, 1, 1)
+        }
+        
+    </script>
+</body>
+</html>
