@@ -1,0 +1,37 @@
+name: pixel-war
+
+services:
+  redis:
+    image: redis:8.10-trixie
+
+  server1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+    environment:
+      REDIS_URL: "redis://redis:6379"
+
+  server2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8000"
+    depends_on:
+      - redis
+    environment:
+      REDIS_URL: "redis://redis:6379"
+
+  bot:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      SERVER_URL: http://server1:8000
+    depends_on:
+      - server1
+    restart: unless-stopped
