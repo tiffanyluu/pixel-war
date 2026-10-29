@@ -20,7 +20,7 @@ while True:
 
         response.raise_for_status()
     except httpx.HTTPError as exc:
-        print(f"An error has occurred: ")
+        print(f"An error has occurred: {exc}")
 
     time.sleep(TIME_TO_SLEEP / 1000)
 

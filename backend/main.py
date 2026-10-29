@@ -1,4 +1,5 @@
 import json
+import os
 import uvicorn
 import redis.asyncio as redis
 import asyncio
@@ -8,8 +9,8 @@ from pathlib import Path
 from pydantic import BaseModel
 from contextlib import asynccontextmanager
 
-
-redis_client = redis.Redis(host="localhost", port=6379)
+REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379")
+redis_client = redis.Redis.from_url(REDIS_URL)
 
 FRONTEND = Path(__file__).parent.parent / "frontend"
 WIDTH = 200
